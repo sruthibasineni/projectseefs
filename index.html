@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Route Management</title>
+  <script src="https://unpkg.com/react/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/babel-standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    class Leg {
+      constructor(source, destination, cost) {
+        this.source = source;
+        this.destination = destination;
+        this.cost = cost;
+      }
+    }
+
+    class RouteManager extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          legs: []
+        };
+      }
+
+      addLeg = () => {
+        const source = prompt("Enter the source city:");
+        const destination = prompt("Enter the destination city:");
+        const cost = parseFloat(prompt("Enter the cost:"));
+
+        const leg = new Leg(source, destination, cost);
+        this.setState(prevState => ({
+          legs: [...prevState.legs, leg]
+        }));
+      };
+
+      updateLeg = (index) => {
+        const { legs } = this.state;
+        const source = prompt("Enter the updated source city:");
+        const destination = prompt("Enter the updated destination city:");
+        const cost = parseFloat(prompt("Enter the updated cost:"));
+
+        const updatedLeg = { ...legs[index], source, destination, cost };
+        legs.splice(index, 1, updatedLeg);
+        this.setState({ legs: [...legs] });
+      };
+
+      deleteLeg = (index) => {
+        const { legs } = this.state;
+        legs.splice(index, 1);
+        this.setState({ legs: [...legs] });
+      };
+
+      getTotalCost = () => {
+        const { legs } = this.state;
+        return legs.reduce((totalCost, leg) => totalCost + leg.cost, 0);
+      };
+
+      handleMenuSelection = (choice) => {
+        switch (choice) {
+          case "1":
+            this.addLeg();
+            break;
+          case "2":
+            this.updateLeg(parseInt(prompt("Enter the index of the leg to update:")));
+            break;
+          case "3":
+            this.deleteLeg(parseInt(prompt("Enter the index of the leg to delete:")));
+            break;
+          default:
+            console.log("Invalid choice!");
+        }
+      };
+
+      render() {
+        const { legs } = this.state;
+
+        return (
+          <div>
+            <h2>Route Management</h2>
+
+            <div>
+              <h3>Options:</h3>
+              <p>1. Add Leg</p>
+              <p>2. Update Leg</p>
+              <p>3. Delete Leg</p>
+              <p>4. Calculate Total Cost</p>
+              <p>Choose an option (1-4): <input type="text" id="menuChoice" /></p>
+              <button onClick={() => this.handleMenuSelection(document.getElementById("menuChoice").value)}>
+                Submit
+              </button>
+            </div>
+
+            <h3>Leg List</h3>
+            <ul>
+              {legs.map((leg, index) => (
+                <li key={index}>
+                  Source: {leg.source}, Destination: {leg.destination}, Cost: {leg.cost}
+                  <button onClick={() => this.updateLeg(index)}>Update</button>
+                  <button onClick={() => this.deleteLeg(index)}>Delete</button>
+                </li>
+              ))}
+            </ul>
+
+            <p>Total cost of the trip: {this.getTotalCost()}</p>
+          </div>
+        );
+      }
+    }
+
+    ReactDOM.render(<RouteManager />, document.getElementById("root"));
+  </script>
+</body>
+
+</html>
